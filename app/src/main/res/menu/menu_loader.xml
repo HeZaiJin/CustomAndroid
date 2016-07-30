@@ -1,0 +1,10 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/loader_glide"
+            android:title="Clide" />
+        <item
+            android:id="@+id/loader_fresco"
+            android:title="Fresco" />
+    </group>
+</menu>
