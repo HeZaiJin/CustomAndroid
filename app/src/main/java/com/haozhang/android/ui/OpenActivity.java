@@ -1,5 +1,6 @@
 package com.haozhang.android.ui;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -21,7 +22,7 @@ public class OpenActivity extends AppCompatActivity {
     private static final String TAG = "OpenActivity";
 
     Button mLoginQQ;
-
+    private ProgressDialog mDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,16 +35,40 @@ public class OpenActivity extends AppCompatActivity {
         mLoginQQ.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                mDialog.show();
                 OpenManager.getInstance(OpenActivity.this).loginQQ(OpenActivity.this, mQQCallback);
             }
         });
+        mDialog = new ProgressDialog(this);
+        mDialog.setMessage("Loading");
     }
 
     private QQIUiListener.QQIUiInfoCallback mQQCallback = new QQIUiListener.QQIUiInfoCallback() {
 
         @Override
-        public void onComplete(JSONObject obj, UserInfo info) {
-            LogUtils.d(TAG,"get userinfo :"+info.toString());
+        public void onCreateUserInfo(UserInfo info) {
+        }
+
+        @Override
+        public void onComplete(JSONObject obj) {
+            if (null == obj)return;
+
+            LogUtils.d(TAG,"get userinfo :"+obj.toString());
+            try {
+                Intent intent = new Intent(OpenActivity.this,QQInfoActivity.class);
+                intent.putExtra("data",obj.toString());
+                if (obj.has("nickname")) {
+                    intent.putExtra("nickname",obj.getString("nickname"));
+                }
+
+                if (obj.has("figureurl_qq_2")) {
+                    intent.putExtra("figureurl_qq_2",obj.getString("figureurl_qq_2"));
+                }
+                startActivity(intent);
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+            mDialog.dismiss();
         }
 
         @Override

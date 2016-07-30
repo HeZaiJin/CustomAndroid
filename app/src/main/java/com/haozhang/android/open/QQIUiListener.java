@@ -76,7 +76,8 @@ public class QQIUiListener implements IUiListener {
 
         if (null != mInfoCallback && null != object) {
             UserInfo userInfo = new UserInfo(mContext, OpenManager.getInstance(mContext).createTencent().getQQToken());
-            mInfoCallback.onComplete(object, userInfo);
+//            mInfoCallback.onComplete(object, userInfo);
+            mInfoCallback.onCreateUserInfo(userInfo);
             userInfo.getUserInfo(mGetInfoListener);
             return;
         }
@@ -89,7 +90,15 @@ public class QQIUiListener implements IUiListener {
     private IUiListener mGetInfoListener = new IUiListener() {
         @Override
         public void onComplete(Object o) {
-            LogUtils.d("IUI","mGetInfoListener : "+o.toString());
+            LogUtils.d("IUI", "mGetInfoListener : " + o.toString());
+            if (null != mInfoCallback && null != o) {
+                try {
+                    JSONObject object = new JSONObject(o.toString());
+                    mInfoCallback.onComplete(object);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
 
         @Override
@@ -143,6 +152,25 @@ public class QQIUiListener implements IUiListener {
 
     public static interface QQIUiInfoCallback {
         /**
+         * {"ret":0,"msg":"",
+         * "is_lost":0,
+         * "nickname":"技近于道",
+         * "gender":"男",
+         * "province":"安徽",
+         * "city":"合肥",
+         * "figureurl":"http:\/\/qzapp.qlogo.cn\/qzapp\/1105580076\/46AA3BD004CA0AC7FB8B41DC3C36FE9B\/30",
+         * "figureurl_1":"http:\/\/qzapp.qlogo.cn\/qzapp\/1105580076\/46AA3BD004CA0AC7FB8B41DC3C36FE9B\/50",
+         * "figureurl_2":"http:\/\/qzapp.qlogo.cn\/qzapp\/1105580076\/46AA3BD004CA0AC7FB8B41DC3C36FE9B\/100",
+         * "figureurl_qq_1":"http:\/\/q.qlogo.cn\/qqapp\/1105580076\/46AA3BD004CA0AC7FB8B41DC3C36FE9B\/40",
+         *
+         * // 高清QQ头像
+         * "figureurl_qq_2":"http:\/\/q.qlogo.cn\/qqapp\/1105580076\/46AA3BD004CA0AC7FB8B41DC3C36FE9B\/100",
+         *
+         * "is_yellow_vip":"0","vip":"0","yellow_vip_level":"0","level":"0","is_yellow_year_vip":"0"}
+         */
+        public void onComplete(JSONObject obj);
+
+        /**
          * {"ret":0,
          * "pay_token":"49DE23B74BAEEFED0A23F6BB6231501D",
          * "pf":"desktop_m_qq-10000144-android-2002-",
@@ -154,8 +182,9 @@ public class QQIUiListener implements IUiListener {
          * "msg":"",
          * "access_token":"E1F60FD08518C659D4497F3D917D792E",
          * "login_cost":1883}
+         * @param info
          */
-        public void onComplete(JSONObject obj, UserInfo info);
+        public void onCreateUserInfo(UserInfo info);
 
         public void onError(UiError e);
 
