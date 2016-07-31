@@ -114,12 +114,13 @@ public class OpenActivity extends AppCompatActivity {
         @Override
         public void onError(UiError e) {
             LogUtils.d(TAG," login onError :"+e.toString());
-
+            mDialog.dismiss();
         }
 
         @Override
         public void onCancel() {
             LogUtils.d(TAG," login cancle");
+            mDialog.dismiss();
         }
     };
 
