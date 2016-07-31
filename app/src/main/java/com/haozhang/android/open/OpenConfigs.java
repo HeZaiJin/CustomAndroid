@@ -6,6 +6,5 @@ package com.haozhang.android.open;
  * @date 2016/7/30.
  */
 public class OpenConfigs {
-
     public static final String APPID_QQ="1105580076";
 }

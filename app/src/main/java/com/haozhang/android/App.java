@@ -3,6 +3,7 @@ package com.haozhang.android;
 import android.app.Application;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.haozhang.android.open.OpenManager;
 
 /**
  * @author HaoZhang
@@ -13,6 +14,6 @@ public class App extends Application {
     public void onCreate() {
         super.onCreate();
         Fresco.initialize(this);
-
+        OpenManager.getInstance().init(this);
     }
 }

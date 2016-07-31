@@ -52,14 +52,15 @@ public class QQIUiListener implements IUiListener {
             if (object.has("openid")) {
                 String openid = object.getString("openid");
                 if (null != openid) {
-                    OpenSharepreference.getInstance(mContext).savePreferenceString("qq_openid", openid);
+                    OpenSharepreference.getInstance().saveQQOpenId(openid);
+                    OpenSharepreference.getInstance().savePreferenceString("qq_openid", openid);
                 }
             }
 
             if (object.has("access_token")) {
                 String access_token = object.getString("access_token");
                 if (null != access_token) {
-                    OpenSharepreference.getInstance(mContext).savePreferenceString("qq_access_token", access_token);
+                    OpenSharepreference.getInstance().saveQQOpenId(access_token);
                 }
             }
 
@@ -67,7 +68,7 @@ public class QQIUiListener implements IUiListener {
                 String expires_in = object.getString("expires_in");
                 if (null != expires_in) {
                     long time = System.currentTimeMillis() + Long.parseLong(expires_in) * 1000;
-                    OpenSharepreference.getInstance(mContext).savePreferenceString("qq_expires_in", String.valueOf(time));
+                    OpenSharepreference.getInstance().saveQQOpenId(String.valueOf(time));
                 }
             }
         } catch (Exception e) {
@@ -75,7 +76,7 @@ public class QQIUiListener implements IUiListener {
         }
 
         if (null != mInfoCallback && null != object) {
-            UserInfo userInfo = new UserInfo(mContext, OpenManager.getInstance(mContext).createTencent().getQQToken());
+            UserInfo userInfo = new UserInfo(mContext, OpenManager.getInstance().createTencent().getQQToken());
 //            mInfoCallback.onComplete(object, userInfo);
             mInfoCallback.onCreateUserInfo(userInfo);
             userInfo.getUserInfo(mGetInfoListener);
@@ -103,12 +104,16 @@ public class QQIUiListener implements IUiListener {
 
         @Override
         public void onError(UiError uiError) {
-
+            if (null != mInfoCallback) {
+                mInfoCallback.onError(uiError);
+            }
         }
 
         @Override
         public void onCancel() {
-
+            if (null != mInfoCallback) {
+                mInfoCallback.onCancel();
+            }
         }
     };
 
@@ -118,6 +123,9 @@ public class QQIUiListener implements IUiListener {
         if (null != mCallback) {
             mCallback.onError(uiError);
         }
+        if (null != mInfoCallback) {
+            mInfoCallback.onError(uiError);
+        }
     }
 
     @Override
@@ -125,8 +133,14 @@ public class QQIUiListener implements IUiListener {
         if (null != mCallback) {
             mCallback.onCancel();
         }
+        if (null != mInfoCallback) {
+            mInfoCallback.onCancel();
+        }
     }
 
+    /**
+     * 登录QQ 返回token信息和openid信息
+     */
     public static interface QQIUiCallback {
 
         /**
@@ -150,6 +164,9 @@ public class QQIUiListener implements IUiListener {
 
     }
 
+    /**
+     * 登录QQ并返回用户数据
+     */
     public static interface QQIUiInfoCallback {
         /**
          * {"ret":0,"msg":"",
@@ -162,10 +179,10 @@ public class QQIUiListener implements IUiListener {
          * "figureurl_1":"http:\/\/qzapp.qlogo.cn\/qzapp\/1105580076\/46AA3BD004CA0AC7FB8B41DC3C36FE9B\/50",
          * "figureurl_2":"http:\/\/qzapp.qlogo.cn\/qzapp\/1105580076\/46AA3BD004CA0AC7FB8B41DC3C36FE9B\/100",
          * "figureurl_qq_1":"http:\/\/q.qlogo.cn\/qqapp\/1105580076\/46AA3BD004CA0AC7FB8B41DC3C36FE9B\/40",
-         *
+         * <p/>
          * // 高清QQ头像
          * "figureurl_qq_2":"http:\/\/q.qlogo.cn\/qqapp\/1105580076\/46AA3BD004CA0AC7FB8B41DC3C36FE9B\/100",
-         *
+         * <p/>
          * "is_yellow_vip":"0","vip":"0","yellow_vip_level":"0","level":"0","is_yellow_year_vip":"0"}
          */
         public void onComplete(JSONObject obj);
@@ -182,6 +199,7 @@ public class QQIUiListener implements IUiListener {
          * "msg":"",
          * "access_token":"E1F60FD08518C659D4497F3D917D792E",
          * "login_cost":1883}
+         *
          * @param info
          */
         public void onCreateUserInfo(UserInfo info);

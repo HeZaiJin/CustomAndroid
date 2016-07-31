@@ -3,6 +3,7 @@ package com.haozhang.android.ui;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -13,6 +14,8 @@ import com.haozhang.android.open.QQIUiListener;
 import com.haozhang.android.utils.LogUtils;
 import com.tencent.connect.UserInfo;
 import com.tencent.connect.common.Constants;
+import com.tencent.connect.share.QQShare;
+import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 import com.tencent.tauth.UiError;
 
@@ -22,6 +25,7 @@ public class OpenActivity extends AppCompatActivity {
     private static final String TAG = "OpenActivity";
 
     Button mLoginQQ;
+    Button mShareQQ;
     private ProgressDialog mDialog;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,12 +40,48 @@ public class OpenActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 mDialog.show();
-                OpenManager.getInstance(OpenActivity.this).loginQQ(OpenActivity.this, mQQCallback);
+                OpenManager.getInstance().loginQQ(OpenActivity.this, mQQCallback);
+            }
+        });
+        mShareQQ = (Button) findViewById(R.id.open_share_qq);
+        mShareQQ.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mDialog.show();
+                final Bundle params = new Bundle();
+                params.putInt(QQShare.SHARE_TO_QQ_KEY_TYPE, QQShare.SHARE_TO_QQ_TYPE_DEFAULT);
+                params.putString(QQShare.SHARE_TO_QQ_TITLE, "要分享的标题");
+                params.putString(QQShare.SHARE_TO_QQ_SUMMARY,  "要分享的摘要");
+                params.putString(QQShare.SHARE_TO_QQ_TARGET_URL,  "http://www.qq.com/news/1.html");
+                params.putString(QQShare.SHARE_TO_QQ_IMAGE_URL,"http://imgcache.qq.com/qzone/space_item/pre/0/66768.gif");
+                params.putString(QQShare.SHARE_TO_QQ_APP_NAME,  "测试应用222222");
+                OpenManager.getInstance().shareToQQ(OpenActivity.this,params ,mShareQQListener);
             }
         });
         mDialog = new ProgressDialog(this);
         mDialog.setMessage("Loading");
     }
+
+    private IUiListener mShareQQListener = new IUiListener() {
+        @Override
+        public void onComplete(Object o) {
+            LogUtils.d(TAG,"share qq onComplete return : "+o.toString());
+            mDialog.dismiss();
+        }
+
+        @Override
+        public void onError(UiError uiError) {
+            LogUtils.d(TAG,"share qq onError : "+uiError.toString());
+            mDialog.dismiss();
+
+        }
+
+        @Override
+        public void onCancel() {
+            LogUtils.d(TAG,"share qq onCancel : ");
+            mDialog.dismiss();
+        }
+    };
 
     private QQIUiListener.QQIUiInfoCallback mQQCallback = new QQIUiListener.QQIUiInfoCallback() {
 
@@ -73,12 +113,13 @@ public class OpenActivity extends AppCompatActivity {
 
         @Override
         public void onError(UiError e) {
+            LogUtils.d(TAG," login onError :"+e.toString());
 
         }
 
         @Override
         public void onCancel() {
-
+            LogUtils.d(TAG," login cancle");
         }
     };
 
@@ -94,6 +135,8 @@ public class OpenActivity extends AppCompatActivity {
         if (requestCode == Constants.REQUEST_LOGIN) {
             Tencent.handleResultData(data, new QQIUiListener(this, mQQCallback));
         }
+        // 分享时必须添加 否则无法拿到回调
+        Tencent.onActivityResultData(requestCode,resultCode,data,mShareQQListener);
         super.onActivityResult(requestCode, resultCode, data);
 
     }
