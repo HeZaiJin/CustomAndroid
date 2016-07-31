@@ -53,14 +53,13 @@ public class QQIUiListener implements IUiListener {
                 String openid = object.getString("openid");
                 if (null != openid) {
                     OpenSharepreference.getInstance().saveQQOpenId(openid);
-                    OpenSharepreference.getInstance().savePreferenceString("qq_openid", openid);
                 }
             }
 
             if (object.has("access_token")) {
                 String access_token = object.getString("access_token");
                 if (null != access_token) {
-                    OpenSharepreference.getInstance().saveQQOpenId(access_token);
+                    OpenSharepreference.getInstance().saveQQAccessToken(access_token);
                 }
             }
 
@@ -68,7 +67,7 @@ public class QQIUiListener implements IUiListener {
                 String expires_in = object.getString("expires_in");
                 if (null != expires_in) {
                     long time = System.currentTimeMillis() + Long.parseLong(expires_in) * 1000;
-                    OpenSharepreference.getInstance().saveQQOpenId(String.valueOf(time));
+                    OpenSharepreference.getInstance().saveQQExpiresIn(String.valueOf(time));
                 }
             }
         } catch (Exception e) {

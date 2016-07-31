@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 
+import com.haozhang.android.utils.LogUtils;
 import com.tencent.tauth.IUiListener;
 import com.tencent.tauth.Tencent;
 
@@ -193,6 +194,7 @@ public class OpenManager {
         String access_token = OpenSharepreference.getInstance().getQQAccessToken();
         String openid = OpenSharepreference.getInstance().getQQOpenid();
         if (null == openid || null == access_token) return tencent;
+        LogUtils.d(TAG,"create tencent  open id :"+openid+", token :"+access_token);
         long time = Long.parseLong(expires_in);
         time = (time - System.currentTimeMillis()) / 1000;
         if (time > 0) {

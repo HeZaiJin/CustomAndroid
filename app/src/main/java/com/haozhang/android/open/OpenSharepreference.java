@@ -11,7 +11,6 @@ public class OpenSharepreference {
     public static final String SP_NAME = "open_data";
     private static volatile OpenSharepreference mPreference;
     Context mContext;
-
     public static final String KEY_QQ_OPENID = "qq_openid";
     public static final String KEY_QQ_ACCESS_TOKEN = "qq_access_token";
     public static final String KEY_QQ_EXPIRES_IN = "qq_expires_in";
